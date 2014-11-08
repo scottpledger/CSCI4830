@@ -94,6 +94,15 @@ class HMMMatrix(HMMDict):
 class HMM(object):
 
     def __init__(self, **kwargs):
+        """
+        If N is the order, {X_t}\subset S is the internal state sequence
+        and {Y_t}\subset V is the external state sequence then...
+        A[i][j] = P(X_t=i|<X_t-N,...,X_t-1> =j)
+        AT = Transpose(A)
+        B[i][j] = P(Y_t=i|X_t =j)
+        BT = Transpose(B)
+        Pi[i]   = P(X_0=i)
+        """
 
         self.order = 1 if 'order' not in kwargs else kwargs['order']
 
@@ -107,13 +116,7 @@ class HMM(object):
             self.Sn = ["".join(t) for t in itertools.product(self.S, repeat=i)]
             self.PiS += self.Sn
 
-        # If N is the order, {X_t}\subset S is the internal state sequence
-        # and {Y_t}\subset V is the external state sequence then...
-        # A[i][j] = P(X_t=i|<X_t-N,...,X_t-1> =j)
-        # AT = Transpose(A)
-        # B[i][j] = P(Y_t=i|X_t =j)
-        # BT = Transpose(B)
-        # Pi[i]   = P(X_0=i)
+        
         self.A = None
         self.B = None
         self.AT = None
