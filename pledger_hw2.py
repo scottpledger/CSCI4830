@@ -5,6 +5,10 @@ from multiprocessing import Pool
 
 
 class HMMDict(collections.OrderedDict):
+    """
+    This is really just a dictionary with default values
+    (which are produced from a lambda function).
+    """
 
     def __init__(self,*args,**kwargs):
         collections.OrderedDict.__init__(self,*args)
@@ -26,6 +30,11 @@ class HMMDict(collections.OrderedDict):
         return d
 
 class HMMVector(HMMDict):
+    """
+    Identical to HMMDict only it takes a single-value for the default
+    and also accepts A=* as a parameter, which is only used for printing it out.
+    """
+
     def __init__(self,*args,**kwargs):
         self.d = d = 0 if 'default' not in kwargs else kwargs['default']
         kwargs['default'] = (lambda: d)
@@ -43,6 +52,10 @@ class HMMVector(HMMDict):
         return d
 
 class HMMMatrix(HMMDict):
+    """
+    Like HMMVector only it also takes a B=* parameter
+    again for printing it out.  Acts like a 2D array.
+    """
 
     def __init__(self,*args,**kwargs):
 
@@ -135,10 +148,10 @@ class HMM(object):
                 # We need to add to initial distribution
                 self.PiCounts[qi[-1]] += 1
             else:
-                self.Acounts[qi[-1]][prev[0]] += 1
+                #self.Acounts[qi[-1]][prev[0]] += 1
                 self.ATcounts[prev[0]][qi[-1]] += 1
 
-            self.Bcounts[vi[-1]][qi[-1]] += 1
+            #self.Bcounts[vi[-1]][qi[-1]] += 1
             self.BTcounts[qi[-1]][vi[-1]] += 1
 
             
@@ -149,8 +162,8 @@ class HMM(object):
             
     
     def normalize(self):
-        self.A = self.Acounts.normalized(math.log)
-        self.B = self.Bcounts.normalized(math.log)
+        #self.A = self.Acounts.normalized(math.log)
+        #self.B = self.Bcounts.normalized(math.log)
         self.AT = self.ATcounts.normalized(math.log)
         self.BT = self.BTcounts.normalized(math.log)
         self.Pi = self.PiCounts.normalized(math.log)
@@ -160,8 +173,8 @@ class HMM(object):
         print('S   = %r'%self.S)
         print('Sn  = %r'%self.Sn)
         print('V   = %r'%self.V)
-        print('A_N = %r'%(self.Acounts).keys())
-        print('B_N = %r'%(self.Bcounts).keys())
+        print('A_N = %r'%(self.ATcounts))
+        print('B_N = %r'%(self.BTcounts))
         print('Pi_N= %r'%(self.PiCounts))
 
 class Viterbi(object):
