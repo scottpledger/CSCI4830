@@ -110,7 +110,9 @@ class HMM(object):
         # If N is the order, {X_t}\subset S is the internal state sequence
         # and {Y_t}\subset V is the external state sequence then...
         # A[i][j] = P(X_t=i|<X_t-N,...,X_t-1> =j)
+        # AT = Transpose(A)
         # B[i][j] = P(Y_t=i|X_t =j)
+        # BT = Transpose(B)
         # Pi[i]   = P(X_0=i)
         self.A = None
         self.B = None
@@ -148,10 +150,10 @@ class HMM(object):
                 # We need to add to initial distribution
                 self.PiCounts[qi[-1]] += 1
             else:
-                #self.Acounts[qi[-1]][prev[0]] += 1
+                self.Acounts[qi[-1]][prev[0]] += 1
                 self.ATcounts[prev[0]][qi[-1]] += 1
 
-            #self.Bcounts[vi[-1]][qi[-1]] += 1
+            self.Bcounts[vi[-1]][qi[-1]] += 1
             self.BTcounts[qi[-1]][vi[-1]] += 1
 
             
@@ -162,8 +164,8 @@ class HMM(object):
             
     
     def normalize(self):
-        #self.A = self.Acounts.normalized(math.log)
-        #self.B = self.Bcounts.normalized(math.log)
+        self.A = self.Acounts.normalized(math.log)
+        self.B = self.Bcounts.normalized(math.log)
         self.AT = self.ATcounts.normalized(math.log)
         self.BT = self.BTcounts.normalized(math.log)
         self.Pi = self.PiCounts.normalized(math.log)
@@ -185,6 +187,11 @@ class Viterbi(object):
     def correct(self,Y):
         """
         Y is a **word** to be corrected.
+        I use BT and AT to keep with the same format as Wikipedia's article
+        Note that then
+        hmm.AT = trans_p
+        hmm.BT = emit_p
+        hmm.Pi = start_p
         """
 
         self.hmm.normalize()
